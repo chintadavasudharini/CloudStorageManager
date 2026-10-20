@@ -1,0 +1,563 @@
+{% extends "base.html" %}
+
+{% block title %}S3 Explorer - CloudStorageManager{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Left Sidebar: Bucket List & Bucket Operations -->
+    <div class="col-lg-3">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-dark">
+                    <i class="bi bi-bucket-fill text-primary me-1"></i> S3 Buckets
+                </span>
+                <button class="btn btn-sm btn-outline-primary rounded-pill d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#createBucketModal">
+                    <i class="bi bi-plus-circle"></i> New
+                </button>
+            </div>
+            <div class="list-group list-group-flush list-group-hoverable overflow-auto" style="max-height: 480px;">
+                {% if buckets %}
+                    {% for b in buckets %}
+                        <a href="{{ url_for('main.explorer', bucket=b.name) }}" 
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 {% if b.name == current_bucket %}active border-start-primary{% endif %}">
+                            <div class="d-flex align-items-center text-truncate">
+                                <i class="bi bi-hdd-stack me-2 {% if b.name == current_bucket %}text-white{% else %}text-secondary{% endif %}"></i>
+                                <span class="text-truncate fw-medium">{{ b.name }}</span>
+                            </div>
+                            <span class="badge {% if b.name == current_bucket %}bg-light text-dark{% else %}bg-secondary-subtle text-secondary{% endif %} rounded-pill small">
+                                S3
+                            </span>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="p-4 text-center text-muted">
+                        <i class="bi bi-inbox fs-1 mb-2 d-block"></i>
+                        <p class="mb-2">No buckets available</p>
+                        <button class="btn btn-sm btn-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#createBucketModal">
+                            Create your first bucket
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+            {% if bucket_err %}
+                <div class="card-footer bg-danger-subtle text-danger small">
+                    <i class="bi bi-exclamation-circle me-1"></i> {{ bucket_err }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Quick Info Box -->
+        <div class="card shadow-sm border-0 bg-white p-3">
+            <h6 class="fw-bold mb-2"><i class="bi bi-shield-check text-success me-1"></i> Security Features</h6>
+            <ul class="list-unstyled small text-muted mb-0">
+                <li class="mb-2"><i class="bi bi-check-lg text-primary me-1"></i> <strong>Zero Public Access:</strong> Buckets remain private.</li>
+                <li class="mb-2"><i class="bi bi-check-lg text-primary me-1"></i> <strong>Presigned URLs:</strong> Ephemeral cryptographic download/upload tokens.</li>
+                <li class="mb-0"><i class="bi bi-check-lg text-primary me-1"></i> <strong>IAM Controlled:</strong> Granular principal authentication.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Right Main: Objects Explorer & File Management -->
+    <div class="col-lg-9">
+        {% if current_bucket %}
+            <!-- Breadcrumbs Bar -->
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-body py-2 px-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <nav aria-label="breadcrumb" class="mb-0">
+                        <ol class="breadcrumb mb-0 align-items-center">
+                            <li class="breadcrumb-item">
+                                <a href="{{ url_for('main.explorer') }}" class="text-decoration-none">
+                                    <i class="bi bi-clouds text-secondary"></i> All Buckets
+                                </a>
+                            </li>
+                            {% for crumb in breadcrumbs[1:] %}
+                                {% if loop.last %}
+                                    <li class="breadcrumb-item active fw-bold text-dark" aria-current="page">
+                                        {{ crumb.name }}
+                                    </li>
+                                {% else %}
+                                    <li class="breadcrumb-item">
+                                        <a href="{{ crumb.url }}" class="text-decoration-none">{{ crumb.name }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ol>
+                    </nav>
+
+                    <span class="badge bg-light text-muted border">
+                        Prefix: <code class="text-dark">{{ prefix or '/' }}</code>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Action Toolbar & Search Bar -->
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-body py-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <button class="btn btn-primary d-flex align-items-center gap-1 shadow-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                            <i class="bi bi-cloud-arrow-up-fill"></i> Upload File
+                        </button>
+                        <button class="btn btn-outline-secondary d-flex align-items-center gap-1 rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#createFolderModal">
+                            <i class="bi bi-folder-plus"></i> New Folder
+                        </button>
+                        <a href="{{ url_for('main.explorer', bucket=current_bucket, prefix=prefix) }}" class="btn btn-outline-secondary rounded-pill" title="Refresh">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </a>
+                    </div>
+
+                    <!-- Search / Filter Field -->
+                    <div class="input-group" style="max-width: 280px;">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" id="fileFilterInput" class="form-control border-start-0" placeholder="Filter files or folders...">
+                    </div>
+                </div>
+            </div>
+
+            {% if object_err %}
+                <div class="alert alert-danger shadow-sm">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ object_err }}
+                </div>
+            {% endif %}
+
+            <!-- Files & Folders Table -->
+            <div class="card shadow-sm border-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="objectsTable">
+                        <thead class="table-light text-secondary text-uppercase fs-7">
+                            <tr>
+                                <th scope="col" style="min-width: 240px;">Name</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Size</th>
+                                <th scope="col">Last Modified</th>
+                                <th scope="col">Storage Class</th>
+                                <th scope="col" class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Parent Directory row if inside a folder -->
+                            {% if prefix %}
+                                {% set parent_prefix = prefix.rstrip('/').rsplit('/', 1)[0] %}
+                                {% set parent_url = url_for('main.explorer', bucket=current_bucket, prefix=parent_prefix + ('/' if parent_prefix else '')) %}
+                                <tr>
+                                    <td colspan="6">
+                                        <a href="{{ parent_url }}" class="text-decoration-none text-secondary d-flex align-items-center gap-2 fw-medium">
+                                            <i class="bi bi-arrow-left-circle fs-5 text-primary"></i> .. (Back to parent directory)
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endif %}
+
+                            <!-- Folder items -->
+                            {% for folder in folders %}
+                                <tr class="object-item-row" data-name="{{ folder.name|lower }}">
+                                    <td>
+                                        <a href="{{ url_for('main.explorer', bucket=current_bucket, prefix=folder.prefix) }}" class="text-decoration-none text-dark fw-semibold d-flex align-items-center gap-2">
+                                            <i class="bi bi-folder-fill fs-5 text-warning"></i>
+                                            <span>{{ folder.name }}</span>
+                                        </a>
+                                    </td>
+                                    <td><span class="badge bg-warning-subtle text-warning-emphasis">Folder</span></td>
+                                    <td class="text-muted">&mdash;</td>
+                                    <td class="text-muted">&mdash;</td>
+                                    <td class="text-muted">&mdash;</td>
+                                    <td class="text-end">
+                                        <a href="{{ url_for('main.explorer', bucket=current_bucket, prefix=folder.prefix) }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+                                            Open <i class="bi bi-chevron-right ms-1"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            <!-- File items -->
+                            {% for file in files %}
+                                <tr class="object-item-row" data-name="{{ file.name|lower }}">
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <!-- Dynamic icon based on extension -->
+                                            {% set ext = file.name.split('.')[-1]|lower %}
+                                            {% if ext in ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'] %}
+                                                <i class="bi bi-file-earmark-image fs-5 text-success"></i>
+                                            {% elif ext in ['pdf'] %}
+                                                <i class="bi bi-file-earmark-pdf fs-5 text-danger"></i>
+                                            {% elif ext in ['txt', 'md', 'json', 'yaml', 'yml', 'xml', 'csv'] %}
+                                                <i class="bi bi-file-earmark-text fs-5 text-info"></i>
+                                            {% elif ext in ['zip', 'tar', 'gz', 'rar'] %}
+                                                <i class="bi bi-file-earmark-zip fs-5 text-warning"></i>
+                                            {% elif ext in ['py', 'js', 'html', 'css', 'ts'] %}
+                                                <i class="bi bi-file-earmark-code fs-5 text-primary"></i>
+                                            {% else %}
+                                                <i class="bi bi-file-earmark fs-5 text-secondary"></i>
+                                            {% endif %}
+                                            <span class="fw-medium text-dark text-break">{{ file.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-secondary border text-uppercase">{{ ext if ext != file.name else 'FILE' }}</span>
+                                    </td>
+                                    <td>
+                                        {% if file.size < 1024 %}
+                                            {{ file.size }} B
+                                        {% elif file.size < 1024 * 1024 %}
+                                            {{ "%.2f"|format(file.size / 1024) }} KB
+                                        {% elif file.size < 1024 * 1024 * 1024 %}
+                                            {{ "%.2f"|format(file.size / (1024 * 1024)) }} MB
+                                        {% else %}
+                                            {{ "%.2f"|format(file.size / (1024 * 1024 * 1024)) }} GB
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-muted small">{{ file.last_modified }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary-subtle text-secondary">{{ file.storage_class }}</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <!-- Presigned URL Generator -->
+                                            <button type="button" class="btn btn-outline-primary" 
+                                                    title="Generate Presigned URL"
+                                                    onclick="openPresignedModal('{{ current_bucket }}', '{{ file.key }}', '{{ file.name }}')">
+                                                <i class="bi bi-link-45deg"></i> Share
+                                            </button>
+
+                                            <!-- Direct Download -->
+                                            <a href="{{ url_for('main.download', bucket=current_bucket, key=file.key) }}" 
+                                               class="btn btn-outline-secondary" 
+                                               title="Download directly">
+                                                <i class="bi bi-download"></i>
+                                            </a>
+
+                                            <!-- Metadata details -->
+                                            <button type="button" class="btn btn-outline-secondary" 
+                                                    title="Object Metadata"
+                                                    onclick="openMetadataModal('{{ current_bucket }}', '{{ file.key }}')">
+                                                <i class="bi bi-info-circle"></i>
+                                            </button>
+
+                                            <!-- Delete object -->
+                                            <button type="button" class="btn btn-outline-danger" 
+                                                    title="Delete Object"
+                                                    onclick="confirmDelete('{{ current_bucket }}', '{{ file.key }}', '{{ file.name }}')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            <!-- Empty folder/bucket state -->
+                            {% if not folders and not files %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-5 text-muted">
+                                        <i class="bi bi-folder2-open display-4 text-secondary-subtle mb-3 d-block"></i>
+                                        <h6 class="fw-bold">This folder is empty</h6>
+                                        <p class="small text-muted mb-3">Upload files or create subfolders to get started.</p>
+                                        <button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                                            <i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload to this folder
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <!-- No Bucket Selected -->
+            <div class="card shadow-sm border-0 text-center py-5">
+                <div class="card-body">
+                    <i class="bi bi-cloud-slash display-3 text-secondary mb-3 d-block"></i>
+                    <h4 class="fw-bold">No S3 Bucket Selected</h4>
+                    <p class="text-muted">Select an existing bucket from the sidebar or create a new one to begin managing files.</p>
+                    <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#createBucketModal">
+                        <i class="bi bi-plus-lg me-1"></i> Create Bucket
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal: Upload File -->
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="uploadModalLabel">
+                    <i class="bi bi-cloud-arrow-up-fill text-primary me-2"></i>Upload File to S3
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="uploadForm">
+                <div class="modal-body">
+                    <input type="hidden" name="bucket" value="{{ current_bucket }}">
+                    <input type="hidden" name="prefix" value="{{ prefix }}">
+
+                    <div class="mb-3 text-muted small">
+                        Uploading to: <strong class="text-dark">{{ current_bucket }}/{{ prefix }}</strong>
+                    </div>
+
+                    <!-- Drag & Drop Area -->
+                    <div class="drop-zone border border-2 border-dashed rounded p-4 text-center bg-light mb-3" id="dropZone">
+                        <i class="bi bi-cloud-upload display-4 text-primary mb-2 d-block"></i>
+                        <p class="mb-1 fw-medium">Drag and drop file here, or click to browse</p>
+                        <p class="text-muted small mb-0">Max size: 100 MB</p>
+                        <input type="file" name="file" id="fileInput" class="d-none" required>
+                    </div>
+
+                    <!-- Selected File Info -->
+                    <div id="selectedFileInfo" class="alert alert-light border d-none align-items-center justify-content-between py-2 px-3 mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-file-earmark-check text-success fs-5"></i>
+                            <span id="selectedFileName" class="fw-medium small"></span>
+                        </div>
+                        <span id="selectedFileSize" class="text-muted small"></span>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress d-none mb-3" id="uploadProgressContainer" style="height: 10px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" id="uploadProgressBar" role="progressbar" style="width: 0%"></div>
+                    </div>
+
+                    <div id="uploadAlert" class="alert d-none small"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4" id="uploadSubmitBtn">
+                        <i class="bi bi-upload me-1"></i> Start Upload
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Presigned URL Generator -->
+<div class="modal fade" id="presignedModal" tabindex="-1" aria-labelledby="presignedModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="presignedModalLabel">
+                    <i class="bi bi-link-45deg text-primary me-2"></i>Generate Presigned URL
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="small text-muted mb-3">
+                    Presigned URLs provide temporary, secure access to private S3 objects without altering bucket permissions or exposing AWS IAM credentials.
+                </p>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Target Object</label>
+                    <input type="text" id="presignedObjectKey" class="form-control form-control-sm bg-light" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Link Expiration</label>
+                    <div class="btn-group w-100 mb-2" role="group">
+                        <input type="radio" class="btn-check" name="expiryPreset" id="exp15m" value="900">
+                        <label class="btn btn-outline-secondary btn-sm" for="exp15m">15 Mins</label>
+
+                        <input type="radio" class="btn-check" name="expiryPreset" id="exp1h" value="3600" checked>
+                        <label class="btn btn-outline-secondary btn-sm" for="exp1h">1 Hour</label>
+
+                        <input type="radio" class="btn-check" name="expiryPreset" id="exp6h" value="21600">
+                        <label class="btn btn-outline-secondary btn-sm" for="exp6h">6 Hours</label>
+
+                        <input type="radio" class="btn-check" name="expiryPreset" id="exp24h" value="86400">
+                        <label class="btn btn-outline-secondary btn-sm" for="exp24h">24 Hours</label>
+                    </div>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text">Custom (Seconds):</span>
+                        <input type="number" id="presignedExpiryInput" class="form-control" value="3600" min="60" max="604800">
+                    </div>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="button" class="btn btn-primary rounded-pill" id="generatePresignedBtn">
+                        <i class="bi bi-lightning-charge-fill me-1"></i> Generate Presigned Link
+                    </button>
+                </div>
+
+                <!-- Generated URL Result Area -->
+                <div id="presignedResultArea" class="d-none">
+                    <div class="alert alert-success py-2 px-3 small d-flex align-items-center mb-2">
+                        <i class="bi bi-check-circle-fill me-2 fs-6"></i>
+                        <span>Link expires at: <strong id="presignedExpiresAt"></strong></span>
+                    </div>
+
+                    <div class="input-group mb-2">
+                        <input type="text" id="generatedUrlInput" class="form-control form-control-sm" readonly>
+                        <button class="btn btn-outline-primary btn-sm" id="copyUrlBtn" type="button">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <a id="openUrlLink" href="#" target="_blank" class="btn btn-sm btn-link text-decoration-none">
+                            Test URL in new tab <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Object Metadata -->
+<div class="modal fade" id="metadataModal" tabindex="-1" aria-labelledby="metadataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="metadataModalLabel">
+                    <i class="bi bi-info-circle-fill text-primary me-2"></i>Object Metadata
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="metadataLoading" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="metadataContent" class="d-none">
+                    <table class="table table-sm table-bordered">
+                        <tbody>
+                            <tr>
+                                <th class="bg-light text-secondary" style="width: 35%;">Key</th>
+                                <td id="metaKey" class="text-break"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light text-secondary">Bucket</th>
+                                <td id="metaBucket"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light text-secondary">Content Type</th>
+                                <td id="metaContentType"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light text-secondary">Size</th>
+                                <td id="metaSize"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light text-secondary">Last Modified</th>
+                                <td id="metaLastModified"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light text-secondary">ETag</th>
+                                <td id="metaETag" class="text-break small"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light text-secondary">Storage Class</th>
+                                <td id="metaStorageClass"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light text-secondary">Encryption</th>
+                                <td id="metaEncryption"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Create Bucket -->
+<div class="modal fade" id="createBucketModal" tabindex="-1" aria-labelledby="createBucketModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="createBucketModalLabel">
+                    <i class="bi bi-bucket-fill text-primary me-2"></i>Create S3 Bucket
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="createBucketForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Bucket Name</label>
+                        <input type="text" name="bucket_name" id="newBucketName" class="form-control" placeholder="my-new-unique-bucket-name" required pattern="^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$">
+                        <div class="form-text small">
+                            Must be globally unique, 3-63 characters, lowercase letters, numbers, and hyphens only.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">AWS Region</label>
+                        <select name="region" class="form-select">
+                            <option value="us-east-1" selected>US East (N. Virginia) us-east-1</option>
+                            <option value="us-west-2">US West (Oregon) us-west-2</option>
+                            <option value="eu-west-1">Europe (Ireland) eu-west-1</option>
+                            <option value="ap-south-1">Asia Pacific (Mumbai) ap-south-1</option>
+                            <option value="ap-southeast-1">Asia Pacific (Singapore) ap-southeast-1</option>
+                        </select>
+                    </div>
+                    <div id="createBucketAlert" class="alert d-none small"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4" id="createBucketSubmitBtn">
+                        Create Bucket
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Create Folder -->
+<div class="modal fade" id="createFolderModal" tabindex="-1" aria-labelledby="createFolderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="createFolderModalLabel">
+                    <i class="bi bi-folder-plus text-primary me-2"></i>Create New Folder
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="createFolderForm">
+                <div class="modal-body">
+                    <input type="hidden" name="bucket" value="{{ current_bucket }}">
+                    <input type="hidden" name="prefix" value="{{ prefix }}">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Folder Name</label>
+                        <input type="text" name="folder_name" id="newFolderName" class="form-control" placeholder="e.g. documents, reports" required>
+                    </div>
+                    <div id="createFolderAlert" class="alert d-none small"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4" id="createFolderSubmitBtn">
+                        Create Folder
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Delete Confirmation -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger-subtle text-danger">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Object Deletion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to permanently delete this object from AWS S3?</p>
+                <div class="alert alert-light border small text-break" id="deleteTargetKey"></div>
+                <p class="small text-danger mb-0">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger rounded-pill px-4" id="confirmDeleteBtn">
+                    <i class="bi bi-trash-fill me-1"></i> Delete Permanently
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

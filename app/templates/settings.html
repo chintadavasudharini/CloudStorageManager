@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}IAM Credentials & Settings - CloudStorageManager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Demo Mode Status Card -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-warning-subtle text-warning-emphasis p-3 rounded-circle">
+                            <i class="bi bi-toggles2 fs-3"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1">Environment Mode</h5>
+                            <p class="text-muted small mb-0">
+                                {% if is_demo %}
+                                    Currently in <strong>Demo Mode</strong> (Local Mock S3 powered by Moto). You can test all uploads, downloads, folders, and presigned URLs risk-free.
+                                {% else %}
+                                    Currently using <strong>Live AWS Credentials</strong>. Connected to your actual AWS S3 infrastructure.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <form action="{{ url_for('auth.toggle_demo') }}" method="POST">
+                        <input type="hidden" name="enable_demo" value="{{ 'false' if is_demo else 'true' }}">
+                        <button type="submit" class="btn {% if is_demo %}btn-primary{% else %}btn-outline-warning{% endif %} rounded-pill px-4">
+                            {% if is_demo %}
+                                Switch to Live AWS
+                            {% else %}
+                                Switch to Demo Mode
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- AWS IAM Credentials Card -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="fw-bold mb-0 text-dark">
+                    <i class="bi bi-shield-lock-fill text-primary me-2"></i>AWS IAM Access Key Controls
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-muted small mb-4">
+                    Enter your AWS IAM User Access Keys below. Credentials entered here are stored in your secure, encrypted session cookie and are never logged or stored to disk.
+                </p>
+
+                <form id="credentialsForm" action="{{ url_for('auth.save_credentials') }}" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">AWS Access Key ID</label>
+                        <input type="text" name="aws_access_key" id="inputAccessKey" class="form-control font-monospace" placeholder="AKIA..." value="{{ saved_key }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">AWS Secret Access Key</label>
+                        <div class="input-group">
+                            <input type="password" name="aws_secret_key" id="inputSecretKey" class="form-control font-monospace" placeholder="••••••••••••••••••••••••••••••••" required>
+                            <button class="btn btn-outline-secondary" type="button" id="toggleSecretVisibility">
+                                <i class="bi bi-eye" id="secretEyeIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold small">AWS Default Region</label>
+                        <select name="aws_region" id="inputRegion" class="form-select">
+                            <option value="us-east-1" {% if saved_region == 'us-east-1' %}selected{% endif %}>US East (N. Virginia) us-east-1</option>
+                            <option value="us-east-2" {% if saved_region == 'us-east-2' %}selected{% endif %}>US East (Ohio) us-east-2</option>
+                            <option value="us-west-1" {% if saved_region == 'us-west-1' %}selected{% endif %}>US West (N. California) us-west-1</option>
+                            <option value="us-west-2" {% if saved_region == 'us-west-2' %}selected{% endif %}>US West (Oregon) us-west-2</option>
+                            <option value="eu-west-1" {% if saved_region == 'eu-west-1' %}selected{% endif %}>Europe (Ireland) eu-west-1</option>
+                            <option value="eu-central-1" {% if saved_region == 'eu-central-1' %}selected{% endif %}>Europe (Frankfurt) eu-central-1</option>
+                            <option value="ap-south-1" {% if saved_region == 'ap-south-1' %}selected{% endif %}>Asia Pacific (Mumbai) ap-south-1</option>
+                            <option value="ap-southeast-1" {% if saved_region == 'ap-southeast-1' %}selected{% endif %}>Asia Pacific (Singapore) ap-southeast-1</option>
+                            <option value="ap-northeast-1" {% if saved_region == 'ap-northeast-1' %}selected{% endif %}>Asia Pacific (Tokyo) ap-northeast-1</option>
+                        </select>
+                    </div>
+
+                    <div id="testConnAlert" class="alert d-none small"></div>
+
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-2 border-top">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-3" id="testConnBtn">
+                            <i class="bi bi-plug me-1"></i> Test Connection
+                        </button>
+
+                        <div class="d-flex gap-2">
+                            {% if saved_key %}
+                                <button type="button" class="btn btn-outline-danger rounded-pill px-3" onclick="document.getElementById('clearCredsForm').submit();">
+                                    Clear Saved
+                                </button>
+                            {% endif %}
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                                <i class="bi bi-save me-1"></i> Save & Connect
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <form id="clearCredsForm" action="{{ url_for('auth.clear_credentials') }}" method="POST" class="d-none"></form>
+            </div>
+        </div>
+
+        <!-- IAM Policy Guide -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h6 class="fw-bold mb-0 text-dark">
+                    <i class="bi bi-file-earmark-code text-primary me-2"></i>Recommended AWS IAM Policy (Least Privilege)
+                </h6>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-muted small mb-3">
+                    For optimal security, attach an IAM policy to your IAM user with only the required S3 permissions:
+                </p>
+                <div class="position-relative">
+                    <pre class="bg-dark text-light p-3 rounded small mb-0" style="max-height: 280px; overflow-y: auto;"><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "VisualEditor0",
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListAllMyBuckets",
+        "s3:GetBucketLocation"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "VisualEditor1",
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::*",
+        "arn:aws:s3:::*/*"
+      ]
+    }
+  ]
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('toggleSecretVisibility');
+    const secretInput = document.getElementById('inputSecretKey');
+    const eyeIcon = document.getElementById('secretEyeIcon');
+    
+    if (toggleBtn && secretInput && eyeIcon) {
+        toggleBtn.addEventListener('click', function() {
+            if (secretInput.type === 'password') {
+                secretInput.type = 'text';
+                eyeIcon.classList.replace('bi-eye', 'bi-eye-slash');
+            } else {
+                secretInput.type = 'password';
+                eyeIcon.classList.replace('bi-eye-slash', 'bi-eye');
+            }
+        });
+    }
+
+    const testBtn = document.getElementById('testConnBtn');
+    const testAlert = document.getElementById('testConnAlert');
+
+    if (testBtn) {
+        testBtn.addEventListener('click', async function() {
+            const accessKey = document.getElementById('inputAccessKey').value.trim();
+            const secretKey = document.getElementById('inputSecretKey').value.trim();
+            const region = document.getElementById('inputRegion').value;
+
+            if (!accessKey || !secretKey) {
+                testAlert.className = 'alert alert-warning small';
+                testAlert.textContent = 'Please enter both Access Key and Secret Key before testing.';
+                testAlert.classList.remove('d-none');
+                return;
+            }
+
+            testBtn.disabled = true;
+            testBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Testing...';
+            testAlert.classList.add('d-none');
+
+            try {
+                const res = await fetch('/auth/test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        aws_access_key: accessKey,
+                        aws_secret_key: secretKey,
+                        aws_region: region
+                    })
+                });
+                const result = await res.json();
+                testAlert.classList.remove('d-none');
+                if (result.success) {
+                    testAlert.className = 'alert alert-success small';
+                    testAlert.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> ' + result.message;
+                } else {
+                    testAlert.className = 'alert alert-danger small';
+                    testAlert.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> ' + result.message;
+                }
+            } catch (err) {
+                testAlert.classList.remove('d-none');
+                testAlert.className = 'alert alert-danger small';
+                testAlert.textContent = 'Connection test failed: ' + err.message;
+            } finally {
+                testBtn.disabled = false;
+                testBtn.innerHTML = '<i class="bi bi-plug me-1"></i> Test Connection';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
