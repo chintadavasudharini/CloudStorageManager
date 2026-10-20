@@ -1,20 +1,51 @@
 /* ==========================================================================
    CloudStorageManager Official Stylesheet
-   Modern Cloud Enterprise UI System
+   Modern Cyber Emerald & Obsidian Theme
    ========================================================================== */
 
 :root {
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
-    --primary-gradient: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #60a5fa 100%);
-    --hero-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-    --cta-gradient: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #0284c7 100%);
+    /* Emerald Cyber Theme (Default) */
+    --primary: #10b981;
+    --primary-hover: #059669;
+    --primary-dark: #047857;
+    --primary-light: #34d399;
+    --primary-subtle: #d1fae5;
+    --primary-glow: rgba(16, 185, 129, 0.4);
+    --primary-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --hero-gradient: linear-gradient(135deg, #070b12 0%, #062b1e 50%, #070b12 100%);
+    --cta-gradient: linear-gradient(135deg, #064e3b 0%, #059669 50%, #10b981 100%);
     --surface: #f8fafc;
     --surface-alt: #f1f5f9;
     --text-main: #0f172a;
     --text-muted: #64748b;
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Alternate Theme: Cyber Violet */
+[data-theme="violet"] {
+    --primary: #8b5cf6;
+    --primary-hover: #7c3aed;
+    --primary-dark: #6d28d9;
+    --primary-light: #a78bfa;
+    --primary-subtle: #ede9fe;
+    --primary-glow: rgba(139, 92, 246, 0.4);
+    --primary-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    --hero-gradient: linear-gradient(135deg, #090615 0%, #200d3d 50%, #090615 100%);
+    --cta-gradient: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #8b5cf6 100%);
+}
+
+/* Alternate Theme: Solar Amber */
+[data-theme="amber"] {
+    --primary: #f59e0b;
+    --primary-hover: #d97706;
+    --primary-dark: #b45309;
+    --primary-light: #fbbf24;
+    --primary-subtle: #fef3c7;
+    --primary-glow: rgba(245, 158, 11, 0.4);
+    --primary-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    --hero-gradient: linear-gradient(135deg, #0f0b06 0%, #2e1605 50%, #0f0b06 100%);
+    --cta-gradient: linear-gradient(135deg, #78350f 0%, #b45309 50%, #f59e0b 100%);
 }
 
 body {
@@ -29,16 +60,77 @@ code, pre, .font-monospace {
 }
 
 /* ==========================================================================
+   Bootstrap Component Overrides for New Theme
+   ========================================================================== */
+.text-primary {
+    color: var(--primary) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary) !important;
+}
+
+.border-primary {
+    border-color: var(--primary) !important;
+}
+
+.bg-primary-subtle {
+    background-color: var(--primary-subtle) !important;
+    color: var(--primary-dark) !important;
+}
+
+.border-primary-subtle {
+    border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+[data-theme="violet"] .border-primary-subtle {
+    border-color: rgba(139, 92, 246, 0.25) !important;
+}
+
+[data-theme="amber"] .border-primary-subtle {
+    border-color: rgba(245, 158, 11, 0.25) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #ffffff !important;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+    background-color: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+    color: #ffffff !important;
+}
+
+.btn-outline-primary {
+    color: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+
+.btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary:active {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #ffffff !important;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 0.25rem var(--primary-glow) !important;
+}
+
+/* ==========================================================================
    Header & Navigation
    ========================================================================== */
 .bg-dark-header {
-    background-color: #0b0f19 !important;
+    background-color: #070b12 !important;
 }
 
 .brand-logo-box {
     width: 38px;
     height: 38px;
     background: var(--primary-gradient);
+    box-shadow: 0 0 15px var(--primary-glow);
 }
 
 .brand-logo-box-sm {
@@ -56,31 +148,44 @@ code, pre, .font-monospace {
     font-size: 0.7rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    color: #94a3b8;
 }
 
 .text-gradient-primary {
-    background: linear-gradient(135deg, #60a5fa 0%, #93c5fd 100%);
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-hero {
-    background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+    background: linear-gradient(135deg, var(--primary-light) 0%, #a7f3d0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-theme="violet"] .text-gradient-hero {
+    background: linear-gradient(135deg, #c084fc 0%, #f472b6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-theme="amber"] .text-gradient-hero {
+    background: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .btn-gradient-primary {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    background: var(--primary-gradient) !important;
     color: #ffffff !important;
-    border: none;
+    border: none !important;
     transition: all 0.2s ease-in-out;
 }
 
 .btn-gradient-primary:hover {
-    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    box-shadow: 0 6px 16px var(--primary-glow);
+    filter: brightness(1.08);
 }
 
 /* ==========================================================================
@@ -95,25 +200,25 @@ code, pre, .font-monospace {
     position: absolute;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(15, 23, 42, 0) 70%);
+    background: radial-gradient(circle, var(--primary-glow) 0%, rgba(7, 11, 18, 0) 70%);
     top: -200px;
     right: -100px;
     pointer-events: none;
 }
 
 .badge-hero {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     color: #e2e8f0;
 }
 
 .badge-dot {
     width: 8px;
     height: 8px;
-    background-color: #3b82f6;
+    background-color: var(--primary);
     border-radius: 50%;
     display: inline-block;
-    box-shadow: 0 0 8px #3b82f6;
+    box-shadow: 0 0 10px var(--primary);
 }
 
 .text-secondary-light {
@@ -128,7 +233,7 @@ code, pre, .font-monospace {
 }
 
 .bg-darker {
-    background-color: #0b0f19 !important;
+    background-color: #06090f !important;
 }
 
 .hover-preview-row {
@@ -146,15 +251,15 @@ code, pre, .font-monospace {
    Badges & Pulsing
    ========================================================================== */
 .badge-demo {
-    background-color: rgba(234, 179, 8, 0.15);
-    color: #eab308;
-    border: 1px solid rgba(234, 179, 8, 0.3);
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .pulse-dot {
     width: 8px;
     height: 8px;
-    background-color: #eab308;
+    background-color: #f59e0b;
     border-radius: 50%;
     display: inline-block;
     animation: pulseGlow 1.8s infinite;
@@ -162,13 +267,13 @@ code, pre, .font-monospace {
 
 @keyframes pulseGlow {
     0% {
-        box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.7);
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
     }
     70% {
-        box-shadow: 0 0 0 6px rgba(234, 179, 8, 0);
+        box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
     }
     100% {
-        box-shadow: 0 0 0 0 rgba(234, 179, 8, 0);
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
     }
 }
 
@@ -176,13 +281,14 @@ code, pre, .font-monospace {
    Cards & Hover Effects
    ========================================================================== */
 .feature-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     border: 1px solid rgba(226, 232, 240, 0.8) !important;
 }
 
 .feature-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 24px -10px rgba(15, 23, 42, 0.1) !important;
+    border-color: var(--primary) !important;
 }
 
 .feature-icon-box {
@@ -222,8 +328,8 @@ code, pre, .font-monospace {
 }
 
 .list-group-hoverable .list-group-item.active {
-    background-color: var(--primary);
-    border-color: var(--primary);
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
     color: #ffffff;
 }
 
@@ -234,8 +340,8 @@ code, pre, .font-monospace {
 }
 
 .drop-zone:hover, .drop-zone.dragover {
-    background-color: #eff6ff !important;
-    border-color: #3b82f6 !important;
+    background-color: var(--primary-subtle) !important;
+    border-color: var(--primary) !important;
 }
 
 .table > :not(caption) > * > * {
@@ -262,7 +368,7 @@ code, pre, .font-monospace {
    Footer
    ========================================================================== */
 .bg-dark-footer {
-    background-color: #0b0f19;
+    background-color: #070b12;
 }
 
 .footer-link {
@@ -272,7 +378,7 @@ code, pre, .font-monospace {
 }
 
 .footer-link:hover {
-    color: #ffffff;
+    color: var(--primary-light);
 }
 
 .social-icon {
@@ -285,6 +391,31 @@ code, pre, .font-monospace {
 
 .hover-white:hover {
     color: #ffffff !important;
+}
+
+/* ==========================================================================
+   Theme Selector Pill
+   ========================================================================== */
+.theme-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.theme-dot-emerald {
+    background-color: #10b981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+}
+
+.theme-dot-violet {
+    background-color: #8b5cf6;
+    box-shadow: 0 0 6px rgba(139, 92, 246, 0.6);
+}
+
+.theme-dot-amber {
+    background-color: #f59e0b;
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
 }
 
 /* ==========================================================================
