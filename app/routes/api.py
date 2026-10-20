@@ -1,8 +1,13 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from app import get_s3_service_for_session
 from datetime import datetime, timedelta, timezone
 
 api_bp = Blueprint("api", __name__)
+
+@api_bp.before_request
+def require_api_authentication():
+    if not session.get("user_id"):
+        return jsonify({"success": False, "error": "Authentication required. Please sign in to perform this action."}), 401
 
 @api_bp.route("/upload", methods=["POST"])
 def upload():

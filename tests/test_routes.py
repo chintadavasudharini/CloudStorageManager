@@ -40,6 +40,14 @@ def test_unauthenticated_redirect(unauthenticated_client):
     assert response.status_code == 302
     assert "/auth/login" in response.headers["Location"]
 
+def test_unauthenticated_api_blocked(unauthenticated_client):
+    response = unauthenticated_client.post("/api/presigned-url", json={
+        "bucket": "test",
+        "key": "test.txt"
+    })
+    assert response.status_code == 401
+    assert response.get_json()["success"] is False
+
 def test_signup_flow(unauthenticated_client):
     # Test Signup GET
     res_get = unauthenticated_client.get("/auth/signup")

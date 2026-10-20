@@ -96,6 +96,7 @@ def download():
     )
 
 @main_bp.route("/view")
+@login_required
 def view_inline():
     bucket = request.args.get("bucket")
     key = request.args.get("key")
