@@ -38,24 +38,32 @@
                             </div>
                         </div>
 
+                        <!-- Password with Show/Hide Toggle -->
                         <div class="mb-3">
                             <label class="form-label small fw-semibold">Password</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-end-0 text-muted">
                                     <i class="bi bi-lock"></i>
                                 </span>
-                                <input type="password" name="password" id="signupPassword" class="form-control border-start-0" placeholder="Minimum 6 characters" minlength="6" required>
+                                <input type="password" name="password" id="signupPassword" class="form-control border-start-0 border-end-0" placeholder="Minimum 6 characters" minlength="6" required>
+                                <button class="btn btn-outline-secondary border-start-0" type="button" id="toggleSignupPassword" title="Show or hide password">
+                                    <i class="bi bi-eye" id="signupPasswordEyeIcon"></i>
+                                </button>
                             </div>
                             <div class="form-text small text-muted">At least 6 characters.</div>
                         </div>
 
+                        <!-- Confirm Password with Show/Hide Toggle -->
                         <div class="mb-3">
                             <label class="form-label small fw-semibold">Confirm Password</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-end-0 text-muted">
                                     <i class="bi bi-shield-check"></i>
                                 </span>
-                                <input type="password" name="confirm_password" class="form-control border-start-0" placeholder="Re-type password" minlength="6" required>
+                                <input type="password" name="confirm_password" id="signupConfirmPassword" class="form-control border-start-0 border-end-0" placeholder="Re-type password" minlength="6" required>
+                                <button class="btn btn-outline-secondary border-start-0" type="button" id="toggleConfirmPassword" title="Show or hide confirm password">
+                                    <i class="bi bi-eye" id="confirmPasswordEyeIcon"></i>
+                                </button>
                             </div>
                         </div>
 
@@ -90,4 +98,32 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function setupPasswordToggle(buttonId, inputId, iconId) {
+        const toggleBtn = document.getElementById(buttonId);
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+
+        if (toggleBtn && input && icon) {
+            toggleBtn.addEventListener('click', function() {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.replace('bi-eye', 'bi-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.replace('bi-eye-slash', 'bi-eye');
+                }
+            });
+        }
+    }
+
+    // Initialize toggle for Password and Confirm Password
+    setupPasswordToggle('toggleSignupPassword', 'signupPassword', 'signupPasswordEyeIcon');
+    setupPasswordToggle('toggleConfirmPassword', 'signupConfirmPassword', 'confirmPasswordEyeIcon');
+});
+</script>
 {% endblock %}
