@@ -84,9 +84,25 @@
                         </ol>
                     </nav>
 
-                    <span class="badge bg-light text-muted border">
-                        Prefix: <code class="text-dark">{{ prefix or '/' }}</code>
-                    </span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-light text-muted border">
+                            Prefix: <code class="text-dark">{{ prefix or '/' }}</code>
+                        </span>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                            <i class="bi bi-file-earmark me-1"></i>{{ files|length }} file{{ 's' if files|length != 1 else '' }}
+                        </span>
+                        {% if total_size %}
+                            <span class="badge bg-secondary-subtle text-secondary-emphasis border">
+                                {% if total_size < 1024 %}
+                                    {{ total_size }} B
+                                {% elif total_size < 1024 * 1024 %}
+                                    {{ "%.1f"|format(total_size / 1024) }} KB
+                                {% else %}
+                                    {{ "%.2f"|format(total_size / (1024 * 1024)) }} MB
+                                {% endif %}
+                            </span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 

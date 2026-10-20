@@ -23,7 +23,11 @@ def build_breadcrumbs(bucket, prefix):
 
 @main_bp.route("/")
 def index():
-    return redirect(url_for("main.explorer"))
+    return render_template("index.html")
+
+@main_bp.route("/docs")
+def docs():
+    return render_template("docs.html")
 
 @main_bp.route("/explorer")
 def explorer():
@@ -41,11 +45,13 @@ def explorer():
     folders = []
     files = []
     object_err = None
+    total_size = 0
 
     if current_bucket:
         obj_data, object_err = s3.list_objects(current_bucket, prefix=prefix)
         folders = obj_data.get("folders", [])
         files = obj_data.get("files", [])
+        total_size = sum(f.get("size", 0) for f in files)
 
     breadcrumbs = build_breadcrumbs(current_bucket, prefix)
 
@@ -56,6 +62,7 @@ def explorer():
         prefix=prefix,
         folders=folders,
         files=files,
+        total_size=total_size,
         breadcrumbs=breadcrumbs,
         bucket_err=err,
         object_err=object_err

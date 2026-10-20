@@ -12,6 +12,16 @@ def client():
             sess["demo_mode"] = True
         yield client
 
+def test_home_page(client):
+    response = client.get("/")
+    assert response.status_code == 200
+    assert b"Enterprise AWS S3 Management" in response.data
+
+def test_docs_page(client):
+    response = client.get("/docs")
+    assert response.status_code == 200
+    assert b"Documentation" in response.data
+
 def test_explorer_get(client):
     response = client.get("/explorer")
     assert response.status_code in (200, 302)

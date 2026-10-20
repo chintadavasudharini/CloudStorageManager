@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}CloudStorageManager | Modern AWS S3 Management Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-light py-5 position-relative overflow-hidden">
+    <div class="hero-bg-glow"></div>
+    <div class="container-fluid px-lg-5 px-3 py-lg-4">
+        <div class="row align-items-center g-5">
+            <!-- Left Column: Copy & Actions -->
+            <div class="col-lg-6 z-1">
+                <div class="d-inline-flex align-items-center gap-2 badge-hero mb-3 py-1.5 px-3 rounded-pill">
+                    <span class="badge-dot"></span>
+                    <span class="fw-semibold small">Secure AWS S3 Cloud Storage Interface</span>
+                </div>
+
+                <h1 class="display-4 fw-extrabold text-white tracking-tight mb-3">
+                    Enterprise AWS S3 Management <br>
+                    <span class="text-gradient-hero">Without The Console Complexity</span>
+                </h1>
+
+                <p class="lead text-secondary-light mb-4 fs-5 leading-relaxed">
+                    Upload, organize, and share files securely with <strong>cryptographic presigned URLs</strong> and <strong>IAM-based access controls</strong>. Keep your target S3 buckets 100% private while granting granular, time-expiring read & download privileges.
+                </p>
+
+                <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+                    <a href="{{ url_for('main.explorer') }}" class="btn btn-gradient-primary btn-lg rounded-pill px-4 py-2.5 shadow-lg fw-bold d-inline-flex align-items-center gap-2">
+                        <i class="bi bi-hdd-network-fill"></i> Launch S3 Console
+                    </a>
+                    <a href="{{ url_for('main.docs') }}" class="btn btn-outline-light btn-lg rounded-pill px-4 py-2.5 fw-semibold d-inline-flex align-items-center gap-2">
+                        <i class="bi bi-file-earmark-text"></i> Documentation
+                    </a>
+                    <a href="https://github.com/chintadavasudharini/CloudStorageManager" target="_blank" class="btn btn-dark-subtle btn-lg rounded-pill px-3 py-2.5 text-secondary hover-white">
+                        <i class="bi bi-github fs-5"></i>
+                    </a>
+                </div>
+
+                <!-- Live Metrics Bar -->
+                <div class="row g-3 pt-3 border-top border-dark-subtle text-secondary small">
+                    <div class="col-4">
+                        <div class="fw-bold text-white fs-5">100%</div>
+                        <div>Private S3 Buckets</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold text-white fs-5">&lt; 100ms</div>
+                        <div>Presigned URL Gen</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold text-white fs-5">Zero</div>
+                        <div>Plaintext Storage</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Interactive Console Preview Card -->
+            <div class="col-lg-6 z-1">
+                <div class="card console-preview-card border-0 shadow-2xl rounded-4 overflow-hidden">
+                    <div class="card-header bg-darker py-3 px-4 d-flex align-items-center justify-content-between border-bottom border-dark">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="circle-dot bg-danger"></span>
+                            <span class="circle-dot bg-warning"></span>
+                            <span class="circle-dot bg-success"></span>
+                            <span class="text-secondary small font-monospace ms-2">s3://my-cloud-storage-demo/</span>
+                        </div>
+                        <span class="badge bg-success-subtle text-success small rounded-pill">
+                            <i class="bi bi-shield-lock-fill me-1"></i> Private Bucket
+                        </span>
+                    </div>
+                    <div class="card-body bg-dark text-light p-4 font-monospace small">
+                        <div class="d-flex justify-content-between text-secondary mb-3 pb-2 border-bottom border-secondary-subtle">
+                            <span>NAME</span>
+                            <span>SIZE / ACTIONS</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center py-2 hover-preview-row">
+                            <span class="text-warning"><i class="bi bi-folder-fill me-2"></i>docs/</span>
+                            <span class="text-secondary">Directory</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center py-2 hover-preview-row">
+                            <span class="text-warning"><i class="bi bi-folder-fill me-2"></i>images/</span>
+                            <span class="text-secondary">Directory</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center py-2 hover-preview-row">
+                            <span class="text-info"><i class="bi bi-file-earmark-text me-2"></i>architecture.md</span>
+                            <span class="badge bg-primary-subtle text-primary">Presigned Share</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center py-2 hover-preview-row">
+                            <span class="text-danger"><i class="bi bi-file-earmark-pdf me-2"></i>q4-report.pdf</span>
+                            <span class="text-secondary">2.4 MB</span>
+                        </div>
+
+                        <!-- Presigned URL Simulation Box -->
+                        <div class="mt-3 p-3 rounded-3 bg-darker border border-primary-subtle">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="text-primary fw-bold"><i class="bi bi-key-fill me-1"></i> Temporary Presigned URL</span>
+                                <span class="badge bg-warning text-dark">Expires in 1h</span>
+                            </div>
+                            <div class="text-truncate text-secondary small">
+                                https://my-bucket.s3.amazonaws.com/report.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Expires=3600...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Core Features Section -->
+<section id="features" class="py-5 bg-white">
+    <div class="container-fluid px-lg-5 px-3 py-4">
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <span class="badge bg-primary-subtle text-primary px-3 py-1.5 rounded-pill fw-semibold small mb-2">Capabilities</span>
+            <h2 class="fw-bold tracking-tight display-6 mb-3">Engineered for Security, Speed, and Control</h2>
+            <p class="text-muted">
+                Every feature is designed to grant you frictionless control over AWS S3 objects while upholding strict cloud security standards.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 feature-card border-0 shadow-sm p-4 rounded-4">
+                    <div class="feature-icon-box bg-primary-subtle text-primary mb-4 rounded-3 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-link-45deg fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Presigned Temporary URLs</h5>
+                    <p class="text-muted small leading-relaxed mb-3">
+                        Generate cryptographic, time-expiring URLs using AWS SigV4. Safely deliver private download links to partners or third parties with custom lifespans from 15 minutes to 7 days.
+                    </p>
+                    <div class="mt-auto pt-2 border-top">
+                        <span class="text-primary small fw-semibold"><i class="bi bi-shield-check me-1"></i> Bucket remains 100% private</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 feature-card border-0 shadow-sm p-4 rounded-4">
+                    <div class="feature-icon-box bg-success-subtle text-success mb-4 rounded-3 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-hdd-stack fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Direct AWS S3 & Boto3 Integration</h5>
+                    <p class="text-muted small leading-relaxed mb-3">
+                        Connects directly to Amazon Web Services using the official Boto3 SDK. Browse buckets, traverse nested folder trees, inspect metadata, and provision new buckets in any global AWS region.
+                    </p>
+                    <div class="mt-auto pt-2 border-top">
+                        <span class="text-success small fw-semibold"><i class="bi bi-check-circle me-1"></i> Global AWS regions supported</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 feature-card border-0 shadow-sm p-4 rounded-4">
+                    <div class="feature-icon-box bg-warning-subtle text-warning-emphasis mb-4 rounded-3 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-shield-lock fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">IAM Least Privilege Controls</h5>
+                    <p class="text-muted small leading-relaxed mb-3">
+                        Authenticate with IAM Access Keys stored exclusively in cryptographically signed session cookies. Built-in connection testing validates IAM credentials against live S3 APIs in real time.
+                    </p>
+                    <div class="mt-auto pt-2 border-top">
+                        <span class="text-warning-emphasis small fw-semibold"><i class="bi bi-lock me-1"></i> Zero plaintext keys saved to disk</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 feature-card border-0 shadow-sm p-4 rounded-4">
+                    <div class="feature-icon-box bg-info-subtle text-info mb-4 rounded-3 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-cloud-arrow-up fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Drag & Drop Upload Pipeline</h5>
+                    <p class="text-muted small leading-relaxed mb-3">
+                        Fast multipart upload support with live progress bars, automatic MIME type detection, and custom metadata tagging right into targeted virtual directory prefixes.
+                    </p>
+                    <div class="mt-auto pt-2 border-top">
+                        <span class="text-info small fw-semibold"><i class="bi bi-speedometer2 me-1"></i> Up to 100 MB per single file</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 5 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 feature-card border-0 shadow-sm p-4 rounded-4">
+                    <div class="feature-icon-box bg-danger-subtle text-danger mb-4 rounded-3 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-file-earmark-ruled fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Deep Object Metadata Inspector</h5>
+                    <p class="text-muted small leading-relaxed mb-3">
+                        Inspect low-level S3 object headers including ETag MD5 checksums, Server-Side Encryption (SSE-S3, SSE-KMS), Content-Type headers, and AWS S3 Storage Classes.
+                    </p>
+                    <div class="mt-auto pt-2 border-top">
+                        <span class="text-danger small fw-semibold"><i class="bi bi-search me-1"></i> Instant HEAD request querying</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 6 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 feature-card border-0 shadow-sm p-4 rounded-4">
+                    <div class="feature-icon-box bg-purple-subtle text-purple mb-4 rounded-3 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-cpu fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Zero-Friction Moto Demo Mode</h5>
+                    <p class="text-muted small leading-relaxed mb-3">
+                        Test and evaluate all console operations locally without AWS credentials or cloud bills using our built-in Moto mock S3 engine, pre-loaded with mock datasets.
+                    </p>
+                    <div class="mt-auto pt-2 border-top">
+                        <span class="text-purple small fw-semibold"><i class="bi bi-play-circle me-1"></i> 1-click instant demo mode</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Architecture Section -->
+<section id="architecture" class="py-5 bg-surface-alt border-top border-bottom border-light-subtle">
+    <div class="container-fluid px-lg-5 px-3 py-4">
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <span class="badge bg-secondary-subtle text-secondary-emphasis px-3 py-1.5 rounded-pill fw-semibold small mb-2">Data Flow</span>
+            <h2 class="fw-bold tracking-tight display-6 mb-3">Cryptographic Security Architecture</h2>
+            <p class="text-muted">
+                How CloudStorageManager isolates S3 buckets and enables time-limited sharing without compromising infrastructure security.
+            </p>
+        </div>
+
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <div class="architecture-diagram bg-dark text-light p-4 rounded-4 shadow-sm font-monospace small">
+                    <div class="d-flex align-items-center justify-content-between mb-4 border-bottom border-secondary pb-2">
+                        <span class="text-primary fw-bold"><i class="bi bi-diagram-3-fill me-2"></i>SigV4 Presigned URL Lifecycle</span>
+                        <span class="text-success small"><i class="bi bi-lock-fill me-1"></i>TLS 1.3 In-Flight</span>
+                    </div>
+
+                    <div class="flow-step mb-3 p-3 rounded-3 bg-darker border border-secondary-subtle">
+                        <span class="badge bg-primary text-white me-2">Step 1</span>
+                        <strong class="text-white">Client Request:</strong>
+                        <div class="text-secondary mt-1">User requests a download or share link for an object with a desired TTL (e.g. 3600 seconds).</div>
+                    </div>
+
+                    <div class="flow-step mb-3 p-3 rounded-3 bg-darker border border-secondary-subtle">
+                        <span class="badge bg-info text-dark me-2">Step 2</span>
+                        <strong class="text-white">Boto3 SigV4 Signing:</strong>
+                        <div class="text-secondary mt-1">Flask server signs the request using the IAM user's credentials without making a network trip to AWS, creating an HMAC-SHA256 token.</div>
+                    </div>
+
+                    <div class="flow-step mb-3 p-3 rounded-3 bg-darker border border-secondary-subtle">
+                        <span class="badge bg-warning text-dark me-2">Step 3</span>
+                        <strong class="text-white">S3 Ephemeral URL Issuance:</strong>
+                        <div class="text-secondary mt-1">Recipient accesses S3 directly using the signed URL. AWS verifies signature and expiration time. S3 bucket remains entirely private.</div>
+                    </div>
+
+                    <div class="flow-step p-3 rounded-3 bg-darker border border-danger-subtle">
+                        <span class="badge bg-danger text-white me-2">Step 4</span>
+                        <strong class="text-white">Automatic Expiration:</strong>
+                        <div class="text-secondary mt-1">Once the configured TTL passes, all subsequent HTTP requests return <code>403 AccessDenied (Request has expired)</code>.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="ps-lg-4">
+                    <h4 class="fw-bold mb-3">Why Presigned URLs Beat Public Buckets</h4>
+                    <p class="text-muted small leading-relaxed mb-4">
+                        Many organizations accidentally leak sensitive data by toggling public read permissions on entire S3 buckets. CloudStorageManager eliminates this threat pattern completely.
+                    </p>
+
+                    <div class="d-flex gap-3 mb-3">
+                        <div class="flex-shrink-0 text-success fs-4"><i class="bi bi-check-circle-fill"></i></div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Zero Bucket Policy Modifications</h6>
+                            <p class="text-muted small mb-0">Bucket ACLs and Block Public Access settings remain securely enabled at all times.</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3 mb-3">
+                        <div class="flex-shrink-0 text-success fs-4"><i class="bi bi-check-circle-fill"></i></div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Bounded Exposure Window</h6>
+                            <p class="text-muted small mb-0">Links expire automatically down to the second, minimizing the window of vulnerability.</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <div class="flex-shrink-0 text-success fs-4"><i class="bi bi-check-circle-fill"></i></div>
+                        <div>
+                            <h6 class="fw-bold mb-1">No IAM Credential Exposure</h6>
+                            <p class="text-muted small mb-0">Third parties download directly from AWS S3 without having access to your IAM secret keys.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Banner -->
+<section class="py-5 bg-gradient-cta text-white text-center">
+    <div class="container-fluid px-lg-5 px-3 py-4">
+        <h2 class="display-6 fw-bold tracking-tight mb-3">Ready to Manage AWS S3 the Smart Way?</h2>
+        <p class="lead text-white-50 max-w-700 mx-auto mb-4 fs-6">
+            Launch the console instantly in Demo Mode or attach your AWS IAM credentials in seconds.
+        </p>
+        <div class="d-flex justify-content-center flex-wrap gap-3">
+            <a href="{{ url_for('main.explorer') }}" class="btn btn-light btn-lg rounded-pill px-5 py-2.5 fw-bold text-dark shadow-sm">
+                <i class="bi bi-hdd-network-fill text-primary me-2"></i> Launch S3 Console
+            </a>
+            <a href="{{ url_for('auth.settings') }}" class="btn btn-outline-light btn-lg rounded-pill px-4 py-2.5 fw-semibold">
+                <i class="bi bi-shield-lock me-2"></i> Configure IAM Keys
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

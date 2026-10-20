@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}Documentation | CloudStorageManager{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 px-3 py-4">
+    <div class="row g-4">
+        <!-- Documentation Sidebar -->
+        <div class="col-lg-3">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 80px;">
+                <div class="card-header bg-white py-3">
+                    <span class="fw-bold text-dark small text-uppercase tracking-wider">
+                        <i class="bi bi-book-half text-primary me-2"></i>Documentation
+                    </span>
+                </div>
+                <div class="list-group list-group-flush small">
+                    <a href="#quickstart" class="list-group-item list-group-item-action py-2.5">
+                        <i class="bi bi-lightning-charge text-primary me-2"></i> Quickstart & Installation
+                    </a>
+                    <a href="#architecture" class="list-group-item list-group-item-action py-2.5">
+                        <i class="bi bi-diagram-3 text-secondary me-2"></i> Architecture Overview
+                    </a>
+                    <a href="#presigned-urls" class="list-group-item list-group-item-action py-2.5">
+                        <i class="bi bi-link-45deg text-success me-2"></i> Presigned URL Mechanics
+                    </a>
+                    <a href="#iam-policy" class="list-group-item list-group-item-action py-2.5">
+                        <i class="bi bi-shield-lock text-warning me-2"></i> IAM Policy & Least Privilege
+                    </a>
+                    <a href="#api-reference" class="list-group-item list-group-item-action py-2.5">
+                        <i class="bi bi-code-slash text-info me-2"></i> REST API Reference
+                    </a>
+                    <a href="#demo-mode" class="list-group-item list-group-item-action py-2.5">
+                        <i class="bi bi-cpu text-purple me-2"></i> Local Moto Mock S3 Mode
+                    </a>
+                    <a href="#faq" class="list-group-item list-group-item-action py-2.5">
+                        <i class="bi bi-question-circle text-secondary me-2"></i> Troubleshooting & FAQ
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documentation Main Body -->
+        <div class="col-lg-9">
+            <div class="card shadow-sm border-0 p-lg-5 p-4 bg-white">
+                
+                <!-- Quickstart Section -->
+                <section id="quickstart" class="mb-5 pb-4 border-bottom">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="badge bg-primary-subtle text-primary">Guide</span>
+                        <h2 class="fw-bold tracking-tight mb-0">Quickstart & Installation</h2>
+                    </div>
+                    <p class="text-muted leading-relaxed">
+                        CloudStorageManager is designed to run locally, on an EC2 instance, or containerized on AWS App Runner with minimal prerequisites.
+                    </p>
+
+                    <h5 class="fw-bold mt-4 mb-2">1. Clone & Set Up Environment</h5>
+                    <div class="bg-dark text-light p-3 rounded-3 font-monospace small mb-3">
+                        git clone https://github.com/chintadavasudharini/CloudStorageManager.git<br>
+                        cd CloudStorageManager<br>
+                        python -m venv venv<br>
+                        .\venv\Scripts\activate  <span class="text-secondary"># Linux/macOS: source venv/bin/activate</span>
+                    </div>
+
+                    <h5 class="fw-bold mt-4 mb-2">2. Install Dependencies</h5>
+                    <div class="bg-dark text-light p-3 rounded-3 font-monospace small mb-3">
+                        pip install -r requirements.txt
+                    </div>
+
+                    <h5 class="fw-bold mt-4 mb-2">3. Run the Development Server</h5>
+                    <div class="bg-dark text-light p-3 rounded-3 font-monospace small mb-3">
+                        python run.py
+                    </div>
+                    <p class="text-muted small">
+                        Navigate to <a href="http://localhost:5000" target="_blank" class="fw-semibold">http://localhost:5000</a> in your web browser. By default, the application runs in <strong>Demo Mode</strong> with mock sample data ready for testing.
+                    </p>
+                </section>
+
+                <!-- Architecture Section -->
+                <section id="architecture" class="mb-5 pb-4 border-bottom">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis">Architecture</span>
+                        <h2 class="fw-bold tracking-tight mb-0">Architecture Overview</h2>
+                    </div>
+                    <p class="text-muted leading-relaxed mb-4">
+                        The application is built on a clean three-tier model:
+                    </p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered small">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tier</th>
+                                    <th>Technology</th>
+                                    <th>Purpose</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold">Presentation Layer</td>
+                                    <td>Bootstrap 5, Jinja2, Vanilla JavaScript</td>
+                                    <td>Responsive web dashboard with drag-and-drop file upload, folder navigation, and instant search filter.</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Application Layer</td>
+                                    <td>Flask, Python 3.14</td>
+                                    <td>Handles route orchestration, session security, REST API responses, and streaming proxy downloads.</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Cloud Storage Layer</td>
+                                    <td>Boto3 AWS SDK, Amazon S3, Moto</td>
+                                    <td>Direct integration with AWS S3 APIs or Moto mock engine using SigV4 signed operations.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Presigned URLs Section -->
+                <section id="presigned-urls" class="mb-5 pb-4 border-bottom">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="badge bg-success-subtle text-success">Security</span>
+                        <h2 class="fw-bold tracking-tight mb-0">Presigned URL Mechanics</h2>
+                    </div>
+                    <p class="text-muted leading-relaxed">
+                        An Amazon S3 presigned URL gives third-party consumers temporary access to an object without requiring them to have AWS IAM permissions or knowledge of access keys.
+                    </p>
+
+                    <div class="card bg-light border-0 p-4 rounded-3 mb-4">
+                        <h6 class="fw-bold mb-2">How it works behind the scenes:</h6>
+                        <ol class="text-muted small mb-0 ps-3">
+                            <li class="mb-2">The client requests a shareable link for an object in a private bucket, specifying a time-to-live (e.g. 3600 seconds).</li>
+                            <li class="mb-2">The Flask backend calculates an HMAC-SHA256 signature using the active IAM Secret Access Key, your region, and the expiration timestamp.</li>
+                            <li class="mb-2">The URL query parameters encode: <code>X-Amz-Algorithm</code>, <code>X-Amz-Credential</code>, <code>X-Amz-Date</code>, <code>X-Amz-Expires</code>, and <code>X-Amz-Signature</code>.</li>
+                            <li>The recipient downloads the file directly from AWS S3. Once the time expires, AWS automatically refuses the link with a <code>403 Request has expired</code> error.</li>
+                        </ol>
+                    </div>
+
+                    <h6 class="fw-bold mb-2">Python Boto3 Implementation Snippet:</h6>
+                    <pre class="bg-dark text-light p-3 rounded-3 small font-monospace"><code>url = s3_client.generate_presigned_url(
+    ClientMethod='get_object',
+    Params={'Bucket': 'my-bucket', 'Key': 'reports/annual.pdf'},
+    ExpiresIn=3600  # Link valid for 1 hour
+)</code></pre>
+                </section>
+
+                <!-- IAM Policy Section -->
+                <section id="iam-policy" class="mb-5 pb-4 border-bottom">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="badge bg-warning-subtle text-warning-emphasis">IAM</span>
+                        <h2 class="fw-bold tracking-tight mb-0">IAM Policy & Least Privilege</h2>
+                    </div>
+                    <p class="text-muted leading-relaxed">
+                        Following the Principle of Least Privilege (PoLP), your IAM User should not have <code>AdministratorAccess</code>. Instead, attach the following tailored policy:
+                    </p>
+                    <div class="position-relative">
+                        <pre class="bg-dark text-light p-3 rounded-3 small font-monospace"><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowBucketListing",
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListAllMyBuckets",
+        "s3:GetBucketLocation"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowObjectOperations",
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::*",
+        "arn:aws:s3:::*/*"
+      ]
+    }
+  ]
+}</code></pre>
+                    </div>
+                </section>
+
+                <!-- REST API Reference -->
+                <section id="api-reference" class="mb-5 pb-4 border-bottom">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="badge bg-info-subtle text-info">API</span>
+                        <h2 class="fw-bold tracking-tight mb-0">REST API Reference</h2>
+                    </div>
+                    <p class="text-muted leading-relaxed mb-4">
+                        All endpoints return JSON responses.
+                    </p>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover small">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Endpoint</th>
+                                    <th>Method</th>
+                                    <th>Parameters</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>/api/upload</code></td>
+                                    <td><span class="badge bg-success">POST</span></td>
+                                    <td><code>bucket</code>, <code>prefix</code>, <code>file</code> (multipart)</td>
+                                    <td>Uploads file object to target S3 prefix with automatic MIME detection.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/api/presigned-url</code></td>
+                                    <td><span class="badge bg-success">POST</span></td>
+                                    <td><code>bucket</code>, <code>key</code>, <code>expiration</code> (seconds)</td>
+                                    <td>Generates cryptographically signed ephemeral download/upload URL.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/api/delete</code></td>
+                                    <td><span class="badge bg-danger">POST</span></td>
+                                    <td><code>bucket</code>, <code>key</code></td>
+                                    <td>Permanently deletes designated S3 object.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/api/create-bucket</code></td>
+                                    <td><span class="badge bg-success">POST</span></td>
+                                    <td><code>bucket_name</code>, <code>region</code></td>
+                                    <td>Provisions a new globally unique S3 bucket in designated AWS region.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/api/create-folder</code></td>
+                                    <td><span class="badge bg-success">POST</span></td>
+                                    <td><code>bucket</code>, <code>prefix</code>, <code>folder_name</code></td>
+                                    <td>Creates virtual directory marker in S3 bucket.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/api/metadata</code></td>
+                                    <td><span class="badge bg-primary">GET</span></td>
+                                    <td><code>bucket</code>, <code>key</code></td>
+                                    <td>Retrieves object headers: ETag, size, content-type, storage class.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Local Moto Mock S3 Mode -->
+                <section id="demo-mode" class="mb-5 pb-4 border-bottom">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="badge bg-purple-subtle text-purple">Testing</span>
+                        <h2 class="fw-bold tracking-tight mb-0">Local Moto Mock S3 Engine</h2>
+                    </div>
+                    <p class="text-muted leading-relaxed">
+                        When <code>ENABLE_DEMO_MODE=true</code> or no AWS access keys are supplied, CloudStorageManager automatically instantiates a local in-memory Moto S3 mock server with pre-populated sample buckets and mock files.
+                    </p>
+                    <p class="text-muted small">
+                        To run the complete automated test suite:
+                    </p>
+                    <div class="bg-dark text-light p-3 rounded-3 font-monospace small">
+                        python -m pytest tests -v
+                    </div>
+                </section>
+
+                <!-- FAQ Section -->
+                <section id="faq">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis">FAQ</span>
+                        <h2 class="fw-bold tracking-tight mb-0">Frequently Asked Questions</h2>
+                    </div>
+
+                    <div class="accordion accordion-flush" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    Are my AWS credentials stored on the server?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted small">
+                                    No. Credentials submitted through the web UI are stored exclusively inside your browser's encrypted session cookie. They are never logged to console or persisted to disk.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    What is the maximum expiration period for presigned URLs?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted small">
+                                    AWS Signature Version 4 allows a maximum expiration duration of 604,800 seconds (7 days) for IAM User credentials. CloudStorageManager supports durations from 60 seconds up to 7 days.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Does this require modifying my S3 bucket public access policies?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted small">
+                                    No. Your S3 bucket can have "Block all public access" turned ON. Presigned URLs work with 100% private buckets.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
