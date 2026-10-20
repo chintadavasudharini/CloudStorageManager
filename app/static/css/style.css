@@ -1,10 +1,10 @@
 /* ==========================================================================
    CloudStorageManager Official Stylesheet
-   Solar Amber & Warm Obsidian Theme (Default)
+   Solar Amber & Warm Obsidian Theme
    ========================================================================== */
 
 :root {
-    /* Solar Amber Theme (Default) */
+    /* Solar Amber Palette */
     --primary: #f59e0b;
     --primary-hover: #d97706;
     --primary-dark: #b45309;
@@ -22,32 +22,6 @@
     --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* Alternate Theme: Cyber Emerald */
-[data-theme="emerald"] {
-    --primary: #10b981;
-    --primary-hover: #059669;
-    --primary-dark: #047857;
-    --primary-light: #34d399;
-    --primary-subtle: #d1fae5;
-    --primary-glow: rgba(16, 185, 129, 0.4);
-    --primary-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    --hero-gradient: linear-gradient(135deg, #070b12 0%, #062b1e 50%, #070b12 100%);
-    --cta-gradient: linear-gradient(135deg, #064e3b 0%, #059669 50%, #10b981 100%);
-}
-
-/* Alternate Theme: Cyber Violet */
-[data-theme="violet"] {
-    --primary: #8b5cf6;
-    --primary-hover: #7c3aed;
-    --primary-dark: #6d28d9;
-    --primary-light: #a78bfa;
-    --primary-subtle: #ede9fe;
-    --primary-glow: rgba(139, 92, 246, 0.4);
-    --primary-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-    --hero-gradient: linear-gradient(135deg, #090615 0%, #200d3d 50%, #090615 100%);
-    --cta-gradient: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #8b5cf6 100%);
-}
-
 body {
     font-family: var(--font-sans);
     color: var(--text-main);
@@ -60,7 +34,7 @@ code, pre, .font-monospace {
 }
 
 /* ==========================================================================
-   Bootstrap Component Overrides for Theme
+   Bootstrap Component Overrides for Solar Amber
    ========================================================================== */
 .text-primary {
     color: var(--primary) !important;
@@ -81,14 +55,6 @@ code, pre, .font-monospace {
 
 .border-primary-subtle {
     border-color: rgba(245, 158, 11, 0.3) !important;
-}
-
-[data-theme="emerald"] .border-primary-subtle {
-    border-color: rgba(16, 185, 129, 0.25) !important;
-}
-
-[data-theme="violet"] .border-primary-subtle {
-    border-color: rgba(139, 92, 246, 0.25) !important;
 }
 
 .btn-primary {
@@ -159,18 +125,6 @@ code, pre, .font-monospace {
 
 .text-gradient-hero {
     background: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-[data-theme="emerald"] .text-gradient-hero {
-    background: linear-gradient(135deg, #34d399 0%, #a7f3d0 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-[data-theme="violet"] .text-gradient-hero {
-    background: linear-gradient(135deg, #c084fc 0%, #f472b6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -297,11 +251,11 @@ code, pre, .font-monospace {
 }
 
 .bg-purple-subtle {
-    background-color: #f3e8ff !important;
+    background-color: #fef3c7 !important;
 }
 
 .text-purple {
-    color: #9333ea !important;
+    color: #b45309 !important;
 }
 
 .bg-surface-alt {
@@ -391,31 +345,6 @@ code, pre, .font-monospace {
 
 .hover-white:hover {
     color: #ffffff !important;
-}
-
-/* ==========================================================================
-   Theme Selector Pill
-   ========================================================================== */
-.theme-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    display: inline-block;
-}
-
-.theme-dot-amber {
-    background-color: #f59e0b;
-    box-shadow: 0 0 6px rgba(245, 158, 11, 0.7);
-}
-
-.theme-dot-emerald {
-    background-color: #10b981;
-    box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
-}
-
-.theme-dot-violet {
-    background-color: #8b5cf6;
-    box-shadow: 0 0 6px rgba(139, 92, 246, 0.7);
 }
 
 /* ==========================================================================
