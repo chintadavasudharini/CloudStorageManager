@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, Response, abort
 from app import get_s3_service_for_session
+from app.auth_utils import login_required
 import os
 
 main_bp = Blueprint("main", __name__)
@@ -30,6 +31,7 @@ def docs():
     return render_template("docs.html")
 
 @main_bp.route("/explorer")
+@login_required
 def explorer():
     s3 = get_s3_service_for_session()
     buckets, err = s3.list_buckets()
@@ -69,6 +71,7 @@ def explorer():
     )
 
 @main_bp.route("/download")
+@login_required
 def download():
     bucket = request.args.get("bucket")
     key = request.args.get("key")

@@ -1,10 +1,15 @@
 from flask import Flask, session
 from app.config import Config
 from app.s3_service import S3Service
+from app.models import init_db, get_user_by_id
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    # Initialize SQLite database
+    with app.app_context():
+        init_db()
 
     # Register blueprints
     from app.routes.main import main_bp
@@ -20,7 +25,14 @@ def create_app(config_class=Config):
         is_demo = session.get("demo_mode", app.config.get("ENABLE_DEMO_MODE", True))
         current_region = session.get("aws_region", app.config.get("AWS_DEFAULT_REGION", "us-east-1"))
         has_custom_creds = bool(session.get("aws_access_key") or app.config.get("AWS_ACCESS_KEY_ID"))
+        
+        current_user = None
+        user_id = session.get("user_id")
+        if user_id:
+            current_user = get_user_by_id(user_id)
+
         return {
+            "current_user": current_user,
             "is_demo_mode": is_demo,
             "current_region": current_region,
             "has_custom_creds": has_custom_creds

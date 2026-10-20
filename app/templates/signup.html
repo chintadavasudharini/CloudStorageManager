@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account | CloudStorageManager{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5 col-xl-4">
+            
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden bg-white">
+                <div class="card-body p-4 p-sm-5">
+                    <div class="text-center mb-4">
+                        <div class="brand-logo-box d-inline-flex align-items-center justify-content-center text-white rounded-3 shadow-sm mb-3">
+                            <i class="bi bi-person-plus-fill fs-4"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark tracking-tight mb-1">Get Started</h4>
+                        <p class="text-muted small">Create your CloudStorageManager account</p>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('auth.signup', next=request.args.get('next')) }}">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Full Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                    <i class="bi bi-person"></i>
+                                </span>
+                                <input type="text" name="full_name" class="form-control border-start-0" placeholder="Alex Morgan" value="{{ full_name or '' }}" required autofocus>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Work Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                <input type="email" name="email" class="form-control border-start-0" placeholder="alex@company.com" value="{{ email or '' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                <input type="password" name="password" id="signupPassword" class="form-control border-start-0" placeholder="Minimum 6 characters" minlength="6" required>
+                            </div>
+                            <div class="form-text small text-muted">At least 6 characters.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                    <i class="bi bi-shield-check"></i>
+                                </span>
+                                <input type="password" name="confirm_password" class="form-control border-start-0" placeholder="Re-type password" minlength="6" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="termsCheck" required checked>
+                                <label class="form-check-label small text-muted" for="termsCheck">
+                                    I agree to the <a href="{{ url_for('main.docs') }}" class="text-primary text-decoration-none">Terms</a> and <a href="{{ url_for('main.docs') }}" class="text-primary text-decoration-none">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-gradient-primary w-100 py-2.5 rounded-pill fw-bold shadow-sm mb-3">
+                            Create Account <i class="bi bi-arrow-right ms-1"></i>
+                        </button>
+
+                        <div class="text-center">
+                            <span class="text-muted small">Already have an account? </span>
+                            <a href="{{ url_for('auth.login', next=request.args.get('next')) }}" class="small fw-semibold text-primary text-decoration-none">
+                                Sign In
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Footer note -->
+            <div class="text-center text-muted small mt-4">
+                <i class="bi bi-hdd-network text-primary me-1"></i> Includes instant Demo Mode with preloaded AWS mock buckets
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

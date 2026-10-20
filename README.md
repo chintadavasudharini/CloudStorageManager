@@ -45,7 +45,13 @@ A web-based interface for managing AWS S3 buckets — upload, download, organize
 - **Object Deletion:** Safe deletion workflows with confirmation dialogs.
 - **Instant Search/Filter:** Filter objects and folders in real time.
 
-### 4. Zero-Friction Demo Mode
+### 4. User Authentication & Profile Security
+- **Secure Signup & Signin:** Encrypted password hashing with `Werkzeug` PBKDF2/SHA256.
+- **SQLite Database:** Zero-config persistent user account management.
+- **Session Protection:** `@login_required` route guards preventing unauthorized console access.
+- **One-Click Demo Account:** Pre-seeded account (`demo@cloudstorage.com` / `demo1234`) with instant autofill for zero-barrier evaluation.
+
+### 5. Zero-Friction Demo Mode
 - Built-in **Mock AWS S3** powered by `moto`.
 - Test all uploads, folder structures, metadata lookups, and presigned URL sharing immediately without configuring real AWS credentials or incurring AWS costs.
 
