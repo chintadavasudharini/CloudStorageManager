@@ -17,8 +17,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script>
         (function() {
-            const savedTheme = localStorage.getItem('csm_theme') || 'emerald';
-            if (savedTheme !== 'emerald') {
+            const savedTheme = localStorage.getItem('csm_theme') || 'amber';
+            if (savedTheme !== 'amber') {
                 document.documentElement.setAttribute('data-theme', savedTheme);
             }
         })();
@@ -101,10 +101,18 @@
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary border-secondary-subtle btn-sm rounded-pill px-2.5 py-1 text-light d-flex align-items-center gap-1.5" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Switch UI Theme">
                             <i class="bi bi-palette2 text-primary"></i>
-                            <span class="theme-dot theme-dot-emerald" id="activeThemeDot"></span>
+                            <span class="theme-dot theme-dot-amber" id="activeThemeDot"></span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2 py-2 small" style="min-width: 170px;">
                             <li><h6 class="dropdown-header small text-uppercase tracking-wider">Color Themes</h6></li>
+                            <li>
+                                <button class="dropdown-item d-flex align-items-center justify-content-between py-1.5" type="button" onclick="setTheme('amber')">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <span class="theme-dot theme-dot-amber"></span> Solar Amber
+                                    </span>
+                                    <i class="bi bi-check2 text-primary theme-check d-none" id="check-amber"></i>
+                                </button>
+                            </li>
                             <li>
                                 <button class="dropdown-item d-flex align-items-center justify-content-between py-1.5" type="button" onclick="setTheme('emerald')">
                                     <span class="d-flex align-items-center gap-2">
@@ -119,14 +127,6 @@
                                         <span class="theme-dot theme-dot-violet"></span> Electric Violet
                                     </span>
                                     <i class="bi bi-check2 text-primary theme-check d-none" id="check-violet"></i>
-                                </button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item d-flex align-items-center justify-content-between py-1.5" type="button" onclick="setTheme('amber')">
-                                    <span class="d-flex align-items-center gap-2">
-                                        <span class="theme-dot theme-dot-amber"></span> Solar Amber
-                                    </span>
-                                    <i class="bi bi-check2 text-primary theme-check d-none" id="check-amber"></i>
                                 </button>
                             </li>
                         </ul>
@@ -301,7 +301,7 @@
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script>
         function setTheme(theme) {
-            if (theme === 'emerald') {
+            if (theme === 'amber') {
                 document.documentElement.removeAttribute('data-theme');
             } else {
                 document.documentElement.setAttribute('data-theme', theme);
@@ -321,7 +321,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            const currentTheme = localStorage.getItem('csm_theme') || 'emerald';
+            const currentTheme = localStorage.getItem('csm_theme') || 'amber';
             updateThemeUI(currentTheme);
         });
     </script>
